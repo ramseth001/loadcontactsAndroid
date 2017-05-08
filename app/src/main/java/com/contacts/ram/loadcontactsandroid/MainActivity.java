@@ -34,7 +34,8 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         setContentView(R.layout.activity_main);
 
         contentResolver = this.getContentResolver();
-
+/* This code checks whether the app has permission to load contacts. If yes, the contacts get loaded into the app.
+ * Else, The app requests permission from user and act accordingly. */
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.READ_CONTACTS) != PackageManager.PERMISSION_GRANTED) {
             if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 requestPermissions(new String[]{Manifest.permission.READ_CONTACTS}, PERMISSION_CONTACTS);
@@ -47,6 +48,7 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
         final String[] from = {ContactsContract.Contacts.DISPLAY_NAME};
         int[] to = {android.R.id.text1};
 
+        /*This adapter gets the list of contact names*/
         adapter = new SimpleCursorAdapter(this, android.R.layout.simple_list_item_1, null, from, to, 0);
 
         final ListView listView = (ListView) findViewById(R.id.listView);
@@ -65,14 +67,14 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 String EmailCONTACT_ID = ContactsContract.CommonDataKinds.Email.CONTACT_ID;
                 String DATA = ContactsContract.CommonDataKinds.Email.DATA;
 
-
+/* This cursor gets the phone numbers of a particular contact */
                 Cursor phoneCursor = contentResolver.query(ContactsContract.CommonDataKinds.Phone.CONTENT_URI, null, Phone_CONTACT_ID + " = ?", new String[]{a}, null);
                 final ArrayList<String> phoneNumbers = new ArrayList<>();
 
                 while (phoneCursor.moveToNext()) {
                     phoneNumbers.add(phoneCursor.getString(phoneCursor.getColumnIndex(NUMBER)));
                 }
-
+/* This cursor gets the email ids of a particular contact*/
                 Cursor emailCursor = contentResolver.query(ContactsContract.CommonDataKinds.Email.CONTENT_URI, null, EmailCONTACT_ID + " = ?", new String[]{a}, null);
                 final ArrayList<String> emailIds = new ArrayList<>();
 
@@ -85,11 +87,12 @@ public class MainActivity extends AppCompatActivity implements LoaderManager.Loa
                 final ArrayList<String> allContactModes = new ArrayList<>();
                 allContactModes.addAll(phoneNumbers);
                 allContactModes.addAll(emailIds);
-
+/* This intent takes you to the messaging screen on the selected phone number */
                 final Intent sendIntent = new Intent(Intent.ACTION_VIEW);
                 sendIntent.setData(Uri.parse("sms:"));
                 sendIntent.putExtra("sms_body", "hello? what's up");
 
+/* This intent takes you to the email app on the selected email id */
                 final Intent intent = new Intent(Intent.ACTION_SEND);
                 intent.setType("plain/text");
                 intent.putExtra(Intent.EXTRA_SUBJECT, "hi");
